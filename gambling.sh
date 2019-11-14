@@ -13,8 +13,8 @@ declare TWENTY_DAYS=20
 #variables
 declare stake=0
 declare totalAmount=0
-declare -a dailyResult
-declare -a amountHistory
+declare -A dailyResult
+declare -A amountHistory
 
 
 function setGoal(){
@@ -56,17 +56,17 @@ function findLuckiestAndWorstDay(){
 	luckiestDay=0
 	luckiestDayAmount=0
 	arrSize=${#amountHistory[@]}
-	for (( i=0 ; i<arrSize ; i++ ))
+	for key in ${!amountHistory[@]}
 	do
-		if [ ${amountHistory[$i]} -gt $luckiestDayAmount ]
+		if [ ${amountHistory[$key]} -gt $luckiestDayAmount ]
 		then
-			luckiestDay=$i
-			luckiestDayAmount=${amountHistory[$i]}
+			luckiestDay=$key
+			luckiestDayAmount=${amountHistory[$key]}
 		fi
-		if [ ${amountHistory[$i]} -lt $worstDayAmount ]
+		if [ ${amountHistory[$key]} -lt $worstDayAmount ]
 		then
-			worstDay=$i  
-   		worstDayAmount=${amountHistory[$i]}
+			worstDay=$key
+   		worstDayAmount=${amountHistory[$key]}
 		fi
 	done
 }
