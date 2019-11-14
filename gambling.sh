@@ -14,6 +14,7 @@ declare TWENTY_DAYS=20
 declare stake=0
 declare totalAmount=0
 declare -a dailyResult
+declare -a amountHistory
 
 
 function setGoal(){
@@ -49,6 +50,26 @@ function checkResign(){
 	fi
 }
 
+function findLuckiestAndWorstDay(){
+	worstDay=0
+	worstDayAmount=$(($GOAL+1))
+	luckiestDay=0
+	luckiestDayAmount=0
+	arrSize=${#amountHistory[@]}
+	for (( i=0 ; i<arrSize ; i++ ))
+	do
+		if [ ${amountHistory[$i]} -gt $luckiestDayAmount ]
+		then
+			luckiestDay=$i
+			luckiestDayAmount=${amountHistory[$i]}
+		fi
+		if [ ${amountHistory[$i]} -lt $worstDayAmount ]
+		then
+			worstDay=$i  
+   		worstDayAmount=${amountHistory[$i]}
+		fi
+	done
+}
 
 for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
 do
@@ -67,7 +88,8 @@ do
 	done
 	dailyProfitOrLoss=$(($stake - $DAILY_INITIAL_STAKE))
 	monthlyProfitOrLoss=$(($monthlyProfitOrLoss + $dailyProfitOrLoss))
+	amountHistory[$day]=$monthlyProfitOrLoss
 	dailyResult[$day]=$dailyProfitOrLoss
 	echo "day ends"
 done
-
+findLuckiestAndWorstDay
