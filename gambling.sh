@@ -13,9 +13,9 @@ declare TWENTY_DAYS=20
 #variables
 declare stake=0
 declare totalAmount=0
-declare -A dailyResult
-declare -A amountHistory
-
+declare dailyProfitOrLoss=0
+declare monthlyProfitOrLoss=0
+declare toContinueNextMonth=0
 
 function setGoal(){
 	GOAL=$(( $stake+$(($stake/2)) ))
@@ -71,25 +71,45 @@ function findLuckiestAndWorstDay(){
 	done
 }
 
-for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
-do
-	stake=$DAILY_INITIAL_STAKE
-	setGoal
-	setBroke
-	while [ $INFINITE_LOOP -eq 1 ]
+function startGamblingMonth(){
+	declare dailyProfitOrLoss=0
+	declare monthlyProfitOrLoss=0
+	declare -A dailyResult
+	declare -A amountHistory
+	
+	for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
 	do
-		bet
-		echo $stake
-		if [ $ENOUGH_FOR_TODAY == 1 ]
-		then
-			ENOUGH_FOR_TODAY=0
-			break
-		fi
+		stake=$DAILY_INITIAL_STAKE
+		setGoal
+		setBroke
+		while [ $INFINITE_LOOP -eq 1 ]
+		do
+			bet
+			echo $stake
+			if [ $ENOUGH_FOR_TODAY == 1 ]
+			then
+				ENOUGH_FOR_TODAY=0
+				break
+			fi
+		done
+		dailyProfitOrLoss=$(($stake - $DAILY_INITIAL_STAKE))
+		monthlyProfitOrLoss=$(($monthlyProfitOrLoss + $dailyProfitOrLoss))
+		amountHistory[$day]=$monthlyProfitOrLoss
+		dailyResult[$day]=$dailyProfitOrLoss
+		echo "day ends"
 	done
-	dailyProfitOrLoss=$(($stake - $DAILY_INITIAL_STAKE))
-	monthlyProfitOrLoss=$(($monthlyProfitOrLoss + $dailyProfitOrLoss))
-	amountHistory[$day]=$monthlyProfitOrLoss
-	dailyResult[$day]=$dailyProfitOrLoss
-	echo "day ends"
+	findLuckiestAndWorstDay
+	toContinueNextMonth=${amountHistory[$TWENTY_DAYS]}
+}
+
+while [ $INFINITE_LOOP -eq 1 ]
+do
+	if [ $toContinueNextMonth -ge 0 ]
+	then
+		sleep 2
+		startGamblingMonth
+	else
+		echo "THATS IT!!!!!!!!!!!!!!!! I WONT GAMBLE ANYMORE!! "
+		break
+	fi
 done
-findLuckiestAndWorstDay
