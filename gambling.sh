@@ -4,7 +4,7 @@
 declare BET_AMOUNT=1
 declare WIN=1
 declare GOAL=0
-declare BROKE=$(( $stake-$(($stake/2)) ))
+declare BROKE=0
 declare DAILY_INITIAL_STAKE=100
 declare INFINITE_LOOP=1
 declare ENOUGH_FOR_TODAY=0
