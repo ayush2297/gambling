@@ -9,20 +9,26 @@ declare DAILY_INITIAL_STAKE=100
 declare INFINITE_LOOP=1
 declare ENOUGH_FOR_TODAY=0
 declare TWENTY_DAYS=20
-
+declare PERCENT=50
 #variables
 declare stake=0
 declare totalAmount=0
 declare dailyProfitOrLoss=0
 declare monthlyProfitOrLoss=0
 declare toContinueNextMonth=0
+declare nPercOfStake=0
+
+function nPercentageOfStake(){
+   temp=$(($DAILY_INITIAL_STAKE * $PERCENT))
+   nPercOfStake=$(( $temp / 100 ))
+}
 
 function setGoal(){
-	GOAL=$(( $stake+$(($stake/2)) ))
+	GOAL=$(( $DAILY_INITIAL_STAKE + $nPercOfStake ))
 }
 
 function setBroke(){
-   BROKE=$(( $stake-$(($stake/2)) ))
+   BROKE=$(( $DAILY_INITIAL_STAKE - $nPercOfStake ))
 }
 
 function bet(){  
@@ -80,8 +86,6 @@ function startGamblingMonth(){
 	for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
 	do
 		stake=$DAILY_INITIAL_STAKE
-		setGoal
-		setBroke
 		while [ $INFINITE_LOOP -eq 1 ]
 		do
 			bet
@@ -102,6 +106,9 @@ function startGamblingMonth(){
 	toContinueNextMonth=${amountHistory[$TWENTY_DAYS]}
 }
 
+nPercentageOfStake
+setGoal
+setBroke
 while [ $INFINITE_LOOP -eq 1 ]
 do
 	if [ $toContinueNextMonth -ge 0 ]
