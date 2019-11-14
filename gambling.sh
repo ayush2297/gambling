@@ -7,7 +7,6 @@ declare stake=100
 
 function bet(){  
    betResult=$((RANDOM%2))
-	checkResign
 	if [ $betResult == $WIN ]
 	then
 		stake=$(($stake+$BET_AMOUNT))
