@@ -1,10 +1,10 @@
-#! /bin/bash 
+#! /bin/bash -x
 
 #constants
 declare BET_AMOUNT=1
 declare WIN=1
 declare GOAL=0
-declare BROKE=$(( $stake-$(($stake/2)) ))
+declare BROKE=0
 declare DAILY_INITIAL_STAKE=100
 declare INFINITE_LOOP=1
 declare ENOUGH_FOR_TODAY=0
@@ -13,7 +13,7 @@ declare TWENTY_DAYS=20
 #variables
 declare stake=0
 declare totalAmount=0
-declare -A dailyResult
+declare -a dailyResult
 
 
 function setGoal(){
@@ -49,6 +49,7 @@ function checkResign(){
 	fi
 }
 
+
 for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
 do
 	stake=$DAILY_INITIAL_STAKE
@@ -64,6 +65,9 @@ do
 			break
 		fi
 	done
-	totalAmount=$(( $totalAmount + $(( $stake-$DAILY_INITIAL_STAKE )) ))
+	dailyProfitOrLoss=$(($stake - $DAILY_INITIAL_STAKE))
+	monthlyProfitOrLoss=$(($monthlyProfitOrLoss + $dailyProfitOrLoss))
+	dailyResult[$day]=$dailyProfitOrLoss
 	echo "day ends"
 done
+
