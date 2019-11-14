@@ -1,4 +1,4 @@
-#! /bin/bash -x
+#! /bin/bash 
 
 #constants
 declare BET_AMOUNT=1
@@ -8,9 +8,13 @@ declare BROKE=$(( $stake-$(($stake/2)) ))
 declare DAILY_INITIAL_STAKE=100
 declare INFINITE_LOOP=1
 declare ENOUGH_FOR_TODAY=0
+declare TWENTY_DAYS=20
 
 #variables
 declare stake=0
+declare totalAmount=0
+declare -A dailyResult
+
 
 function setGoal(){
 	GOAL=$(( $stake+$(($stake/2)) ))
@@ -22,13 +26,15 @@ function setBroke(){
 
 function bet(){  
    betResult=$((RANDOM%2))
-	checkResign
 	if [ $betResult == $WIN ]
 	then
+		totalAmount=$(($totalAmount+1))
 		stake=$(($stake+$BET_AMOUNT))
 	else
+		totalAmount=$(($totalAmount-1))
 		stake=$(($stake-$BET_AMOUNT))
 	fi
+	checkResign
 }
 
 function checkResign(){
@@ -43,22 +49,21 @@ function checkResign(){
 	fi
 }
 
-stake=$DAILY_INITIAL_STAKE
-setGoal
-setBroke
-echo "DAY : " $day
-echo "GOAL : " $GOAL
-echo "LEAVE AT: "$BROKE
-echo "day begins with stake : "$stake
-while [ $INFINITE_LOOP -eq 1 ]
+for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
 do
-	bet
-	count=$(($count+1))
-	echo $stake
-	if [ $ENOUGH_FOR_TODAY == 1 ]
-	then
-		ENOUGH_FOR_TODAY=0
-		break
-	fi
+	stake=$DAILY_INITIAL_STAKE
+	setGoal
+	setBroke
+	while [ $INFINITE_LOOP -eq 1 ]
+	do
+		bet
+		echo $stake
+		if [ $ENOUGH_FOR_TODAY == 1 ]
+		then
+			ENOUGH_FOR_TODAY=0
+			break
+		fi
+	done
+	totalAmount=$(( $totalAmount + $(( $stake-$DAILY_INITIAL_STAKE )) ))
+	echo "day ends"
 done
-echo "day ends with $stake"
