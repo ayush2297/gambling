@@ -3,14 +3,14 @@
 #constants
 declare BET_AMOUNT=1
 declare WIN=1
-declare GOAL=0
-declare BROKE=0
 declare DAILY_INITIAL_STAKE=100
 declare INFINITE_LOOP=1
-declare TWENTY_DAYS=20
+declare MAX_NUMBER_OF_DAYS=20
 declare PERCENT=50
 
 #variables
+declare goal=0
+declare broke=0
 declare enoughForToday=0
 declare stake=0
 declare totalAmount=0
@@ -19,11 +19,21 @@ declare monthlyProfitOrLoss=0
 declare toContinueNextMonth=0
 
 #setting goal(winning) and broke(losing) conditions
-function setGoalAndBroke(){
+function calcNPercOfTotalStake(){
 	local nPercOfStake=$(( $(($DAILY_INITIAL_STAKE * $PERCENT)) / 100 ))
-	GOAL=$(( $DAILY_INITIAL_STAKE + $nPercOfStake ))
-   BROKE=$(( $DAILY_INITIAL_STAKE - $nPercOfStake ))
+	echo $nPercOfStake
 }
+
+#setting goal based on initial stake
+function setGoal(){
+	echo $(($DAILY_INITIAL_STAKE+$1))
+}
+
+#setting broke based on initial stake
+function setBroke(){
+   echo $(($DAILY_INITIAL_STAKE-$1))
+}
+
 
 #perform the action/task of betting
 function bet_once(){
@@ -41,11 +51,11 @@ function bet_once(){
 
 #check for conditions where gambler reaches goal or goes broke
 function checkResign(){
-	if [ $stake -ge $GOAL ]
+	if [ $stake -ge $goal ]
 	then
 		echo "goal reached..... enough for today "
 		enoughForToday=1
-	elif [ $stake -le $BROKE ]
+	elif [ $stake -le $broke ]
 	then
 		echo "lost too much money...enough for today"
 		enoughForToday=1
@@ -72,7 +82,7 @@ function worst(){
 #luckiest and worst day using single for loop .... more efficient
 function findLuckiestAndWorstDay(){
 	local worstDay=0
-	local worstDayAmount=$(($GOAL+1))
+	local worstDayAmount=$(($goal+1))
 	local luckiestDay=0
 	local luckiestDayAmount=0
 	local arrSize=${#amountHistory[@]}
@@ -93,12 +103,10 @@ function findLuckiestAndWorstDay(){
 
 #start gambling activity for this month
 function startGamblingMonth(){
-	declare dailyProfitOrLoss=0
-	declare monthlyProfitOrLoss=0
 	declare -A dailyResult
 	declare -A amountHistory
 
-	for (( day=1 ; $day <= $TWENTY_DAYS ; day++ ))
+	for (( day=1 ; $day <= $MAX_NUMBER_OF_DAYS ; day++ ))
 	do
 		stake=$DAILY_INITIAL_STAKE
 		while [ $INFINITE_LOOP -eq 1 ]
@@ -119,19 +127,25 @@ function startGamblingMonth(){
 	findLuckiestAndWorstDay
 	#luckiest
 	#worst
-	toContinueNextMonth=${amountHistory[$TWENTY_DAYS]}
+	toContinueNextMonth=${amountHistory[$MAX_NUMBER_OF_DAYS]}
 }
 
 #main execution starts  here
-setGoalAndBroke
-while [ $INFINITE_LOOP -eq 1 ]
-do
-	if [ $toContinueNextMonth -ge 0 ]
-	then
-		sleep 2
-		startGamblingMonth
-	else
-		echo "THATS IT!!!!!!!!!!!!!!!! I WONT GAMBLE ANYMORE!! "
-		break
-	fi
-done
+function executionStartsHere(){
+	profitLossMargin=$(calcNPercOfTotalStake)
+	goal=$(setGoal $profitLossMargin )
+	broke=$(setBroke $profitLossMargin )
+	while [ $INFINITE_LOOP -eq 1 ]
+	do
+		if [ $toContinueNextMonth -ge 0 ]
+		then
+			sleep 5
+			startGamblingMonth
+		else
+			echo "THATS IT!!!!!!!!!!!!!!!! I WONT GAMBLE ANYMORE!! "
+			break
+		fi
+	done
+}
+
+executionStartsHere
