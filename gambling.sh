@@ -82,7 +82,7 @@ function findLuckiestAndWorstDay(){
 	local worstDay=0
 	local worstDayAmount=$(($goal+1))
 	local luckiestDay=0
-	local luckiestDayAmount=0
+	local luckiestDayAmount=-1
 	local arrSize=${#amountHistory[@]}
 	for key in ${!amountHistory[@]}
 	do
@@ -123,8 +123,8 @@ function startGamblingMonth(){
 		amountHistory[$day]=$(( ${amountHistory[$(($day-1))]} + $(($stake - $DAILY_INITIAL_STAKE)) ))
 	done
 	findLuckiestAndWorstDay
-	#luckiestDayBasedOnAmount
-	#worstDayBasedOnAmount
+	#luckiestDay=$(luckiestDayBasedOnAmount )
+	#worstDay=$(worstDayBasedOnAmount )
 	toContinueNextMonth=${amountHistory[$MAX_NUMBER_OF_DAYS]}
 }
 
@@ -133,17 +133,15 @@ function executionStartsHere(){
 	profitLossMargin=$(calcNPercOfTotalStake)
 	goal=$(setGoal $profitLossMargin )
 	broke=$(setBroke $profitLossMargin )
-	while [ $INFINITE_LOOP -eq 1 ]
-	do
-		if [ $toContinueNextMonth -ge 0 ]
-		then
-			sleep 5
-			startGamblingMonth
-		else
-			echo "THATS IT!!!!!!!!!!!!!!!! I WONT GAMBLE ANYMORE!! "
-			break
-		fi
-	done
+	startGamblingMonth
+	if [ $toContinueNextMonth -ge 0 ]
+	then
+		sleep 2
+		executionStartsHere
+	else
+		echo "THATS IT!!!!!!!!!!!!!!!! I WONT GAMBLE ANYMORE!! "
+	break
+	fi
 }
 
 executionStartsHere
