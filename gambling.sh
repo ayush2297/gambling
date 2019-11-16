@@ -14,8 +14,6 @@ declare broke=0
 declare enoughForToday=0
 declare stake=0
 declare totalAmount=0
-declare dailyProfitOrLoss=0
-declare monthlyProfitOrLoss=0
 declare toContinueNextMonth=0
 
 #setting goal(winning) and broke(losing) conditions
@@ -31,13 +29,13 @@ function setGoal(){
 
 #setting broke based on initial stake
 function setBroke(){
-   echo $(($DAILY_INITIAL_STAKE-$1))
+	echo $(($DAILY_INITIAL_STAKE-$1))
 }
 
 
 #perform the action/task of betting
-function bet_once(){
-   betResult=$((RANDOM%2))
+function betOnce(){
+	betResult=$((RANDOM%2))
 	if [ $betResult == $WIN ]
 	then
 		totalAmount=$(($totalAmount+1))
@@ -63,19 +61,19 @@ function checkResign(){
 }
 
 #sorting dictionaries using function..for reference
-function luckiest(){
+function luckiestDayBasedOnAmount(){
    luckiestDay=`for day in ${!amountHistory[@]}
-                do
-                  echo $day" - "${amountHistory[$day]}
-                done | sort -nr -k3 | head -1`
+					do
+						echo $day" - "${amountHistory[$day]}
+					done | sort -nr -k3 | head -1`
 	echo $luckiestDay
 }
 
-function worst(){
-   worstDay=`for day in ${!amountHistory[@]}
-           	do
-       	     echo $day" - "${amountHistory[$day]}
-            done | sort -n -k3 | head -1`
+function worstDayBasedOnAmount(){
+	worstDay=`for day in ${!amountHistory[@]}
+				do
+					echo $day" - "${amountHistory[$day]}
+				done | sort -n -k3 | head -1`
 	echo $worstDay
 }
 
@@ -96,7 +94,7 @@ function findLuckiestAndWorstDay(){
 		if [ ${amountHistory[$key]} -lt $worstDayAmount ]
 		then
 			worstDay=$key
-   		worstDayAmount=${amountHistory[$key]}
+			worstDayAmount=${amountHistory[$key]}
 		fi
 	done
 }
@@ -125,8 +123,8 @@ function startGamblingMonth(){
 		amountHistory[$day]=$(( ${amountHistory[$(($day-1))]} + $(($stake - $DAILY_INITIAL_STAKE)) ))
 	done
 	findLuckiestAndWorstDay
-	#luckiest
-	#worst
+	#luckiestDayBasedOnAmount
+	#worstDayBasedOnAmount
 	toContinueNextMonth=${amountHistory[$MAX_NUMBER_OF_DAYS]}
 }
 
