@@ -109,7 +109,7 @@ function startGamblingMonth(){
 		stake=$DAILY_INITIAL_STAKE
 		while [ $INFINITE_LOOP -eq 1 ]
 		do
-			bet_once
+			betOnce
 			echo $stake
 			if [ $enoughForToday == 1 ]
 			then
